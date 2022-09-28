@@ -1,0 +1,62 @@
+{
+    // опции для подключения к серверу Jira
+    "jiraOpts": {
+        "protocol": "https",
+        "host": "jira-medmis.bars.group",
+        "apiPath": "rest/api/latest",
+        "jqlApiPath": "jql/autocompletedata",
+        "workLogApiPath": "rest/tempo-timesheets/4/worklogs",
+        "reportApiPath": "rest/tempo-timesheets/3/worklogs",
+        "authOptions": {
+            "user": "is.",
+            "pass": ""
+        }
+    },
+
+    // запрос по задачам, которые сейчас у меня в работе
+    "myTasksQuery": "",
+
+    // виды работы
+    "workKind": [
+        "Разработка",
+        "Собрания",
+        "Код ревью",
+        "Перенос",
+        "Консультация",
+        "Доработка"
+    ],
+
+    // проекты
+    "projects": [
+        "MEDDEV",
+        "MEDIMP",
+        "MEDPM"
+    ],
+
+    // статусы задач
+    "taskStatuses": [
+        "Текущий",
+        "Взять в разработку",
+        "На ревью",
+        "К разработке",
+        "К тестированию",
+        "Вернуть на анализ",
+        "В ожидание"
+    ],
+
+    // сотрудники, на которых будут переводиться задачи
+    "taskPerformers": [
+        {
+            "login": null,
+            "name": "Текущий"
+        },
+        {
+            "login": "i.dorogan",
+            "name": "Ирина Дороган"
+        },
+        {
+            "login": "a.mishchenko",
+            "name": "Артем Мищенко"
+        }
+    ]
+}
