@@ -20,10 +20,10 @@ export async function logTime(command: ICommand) {
         Object.assign(answer, { type: 'manual', task: `${answer.project}-${answer.task}` })
     }
     try {
-        console.log(answer)
         const status = await jira().postWorkLog(answer)
         if (status === 200) {
             console.log(chalk.green('Данные успешно добавлены!'))
+            getReport()
         } else {
             throw new Error(`Ошибка при логировании времени (logTime): статус запроса (${status})`)
         }
@@ -33,7 +33,7 @@ export async function logTime(command: ICommand) {
 }
 
 // функция для получения отчетов
-export async function getReport(command: ICommand) {
+export async function getReport(command: ICommand = {}) {
     try {
         if (empty(command.m)) {
                 const repData = await jira().getReport('log')

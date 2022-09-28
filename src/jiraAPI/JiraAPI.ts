@@ -63,7 +63,7 @@ export default function jiraAPI(options: IJiraInitOptions): () => IJiraInstanceO
                         },
                         comment: options.comment,
                         originTaskId: issueData.id,
-                        started: parseDate(options.date),
+                        started: parseDate('forJira')(options.date),
                         timeSpentSeconds: options.time * 3600,
                         worker: userData.key
                     })
