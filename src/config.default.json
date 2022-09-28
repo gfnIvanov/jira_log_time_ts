@@ -4,7 +4,6 @@
         "protocol": "https",
         "host": "jira-medmis.bars.group",
         "apiPath": "rest/api/latest",
-        "jqlApiPath": "jql/autocompletedata",
         "workLogApiPath": "rest/tempo-timesheets/4/worklogs",
         "reportApiPath": "rest/tempo-timesheets/3/worklogs",
         "authOptions": {
