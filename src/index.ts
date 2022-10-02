@@ -14,6 +14,10 @@ program
     .action(actions.logTime)
 
 program
+    .command('upd')
+    .action(actions.updateTask)
+
+program
     .command('rep')
     .option('-m', 'My tasks')
     .action(actions.getReport)

@@ -2,7 +2,7 @@ import { ICommand, IRepData, IIssueInfo } from './Actions.types.js'
 import * as router from '../router/Router.js'
 import jiraAPI from '../jiraAPI/JiraAPI.js'
 import { parseDate, empty } from '../utils/utils.js'
-import config from '../config.json' assert { type: 'json' }
+import config from '../config.js'
 import chalk from 'chalk'
 import { Answers } from 'inquirer'
 import _ from 'lodash'
@@ -32,17 +32,46 @@ export async function logTime(command: ICommand) {
     }
 }
 
+// функция для обновления задач
+export async function updateTask(task: string | undefined) {
+    const answer: Answers = await router.updateTask(false)
+    if (empty(task)) {
+        Object.assign(answer, {
+            task: `${answer.project}-${answer.task}`,
+            performer: config.taskPerformers.find(user => user.name === answer.performer)!.login
+        })
+    } else {
+        Object.assign(answer, { task })
+    }
+    try {
+        const res = await jira().updateTask(answer) as [{ url: string, status: string }]
+        const errors = res.map(r => {
+            const action = _.last(r.url.split('/'))
+            if (action === 'comment' && +r.status !== 201 || (action === 'transitions' || action === 'assignee') && +r.status !== 204) {
+                return ` ${action}: (status: ${r.status})`
+            }
+        })
+        if (errors.length > 0) {
+            throw new Error(`Ошибка при обновлении задачи (updateTask): ${errors.join(' ')}`)
+        } else {
+            console.log(chalk.green('Данные успешно обновлены!'))
+        }
+    } catch(err) {
+        console.error(chalk.red(err))
+    }
+}
+
 // функция для получения отчетов
 export async function getReport(command: ICommand = {}) {
     try {
         if (empty(command.m)) {
-                const repData = await jira().getReport('log')
+                const repData = await jira().getReport('log') as { status: string, json: () => Promise<IRepData[]> }
                 if (+repData.status === 200) {
                     const resRepData = await repData.json()
                     const resultMap = new Map()
                     const results: Object[] = []
                     let sum = 0
-                    resRepData.forEach(({ dateStarted, timeSpentSeconds }: IRepData) => {
+                    resRepData.forEach(({ dateStarted, timeSpentSeconds }) => {
                         const started = parseDate('forRead')(dateStarted)
                         if (!resultMap.has(started)) {
                             resultMap.set(started, +timeSpentSeconds / 3600)
@@ -60,11 +89,11 @@ export async function getReport(command: ICommand = {}) {
                     throw new Error(`Ошибка при получении отчета по залогированному времени (getReport): статус запроса (${repData.status})`)
                 }
         } else {
-            const repData = await jira().getReport('my')
+            const repData = await jira().getReport('my') as { status: string, json: () => Promise<{ issues: IIssueInfo[] }> }
             if (+repData.status === 200) {
                 const resRepData = await repData.json()
                 const results: Object[] = []
-                resRepData.issues.forEach((issue: IIssueInfo) => {
+                resRepData.issues.forEach(issue => {
                     results.push({
                         key: issue.key,
                         summary: _.trim(_.truncate(issue.fields.summary, { length: 200, separator: '' })),

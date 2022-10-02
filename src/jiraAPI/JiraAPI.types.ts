@@ -13,6 +13,19 @@ export interface IJiraInitOptions {
 }
 
 export interface IJiraInstanceObject {
-    postWorkLog(options: Answers): Promise<number | undefined>
-    getReport(options: string): Promise<any>
+    postWorkLog(options: Answers): Promise<number | undefined>,
+    updateTask(fields: Answers): Promise<unknown>,
+    getReport(type: string): Promise<unknown>
+}
+
+export interface IUniversalOptions {
+    path: string,
+    headers: HeadersInit,
+    task?: string,
+    user?: string
+    value?: string
+}
+
+export interface IStatuses {
+    transitions: { id: string, name: string }[]
 }
