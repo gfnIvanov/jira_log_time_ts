@@ -1,6 +1,6 @@
 import { Question } from 'inquirer'
 import { InqArr } from './Router.types.js'
-import config from '../config.json' assert { type: 'json' }
+import config from '../config.js'
 
 
 export const logQuestions: InqArr = [
@@ -58,28 +58,28 @@ export const updateTaskLogQuestions: InqArr = [
         type: 'list',
         name: 'project',
         message: 'Проект:',
-        choices: config.projects,
+        choices: config.projects
     },
     {
         type: 'input',
         name: 'task',
-        message: 'Номер таска: ',
+        message: 'Номер таска: '
     },
     {
         type: 'input',
         name: 'comment',
-        message: 'Комментарий: ',
+        message: 'Комментарий: '
     },
     {
         type: 'list',
         name: 'status',
         message: 'Статус:',
-        choices: config.taskStatuses,
+        choices: config.taskStatuses
     },
     {
         type: 'list',
         name: 'performer',
         message: 'Исполнитель:',
-        choices: config.taskPerformers.map(user => user.name),
+        choices: config.taskPerformers.map(user => user.name)
     },
 ]
