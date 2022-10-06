@@ -13,6 +13,7 @@ export interface IJiraInitOptions {
 }
 
 export interface IJiraInstanceObject {
+    getIssueCodeName(task: string): Promise<string | undefined>,
     postWorkLog(options: Answers): Promise<number | undefined>,
     updateTask(fields: Answers): Promise<unknown>,
     getReport(type: string): Promise<unknown>

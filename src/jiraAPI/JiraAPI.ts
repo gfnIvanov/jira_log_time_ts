@@ -39,6 +39,20 @@ export default function jiraAPI(options: IJiraInitOptions): () => IJiraInstanceO
 
     return () => ({
 
+        // получение кода и темы задачи
+        async getIssueCodeName(task: string) {
+            try {
+                const issue = await getIssueInfo({ path: `${hostname}/${apiPath}`, headers, task })
+                if (+issue.status !== 200) {
+                    throw new Error(`Статус запроса: getIssueInfo (${issue.status})`)
+                }
+                const issueData = await issue.json() as { key: string, fields: { summary: string } }
+                return `${issueData.key} ${issueData.fields.summary}.`
+            } catch(err) {
+                console.error(chalk.red('Ошибка при запросе данных (getIssueCodeName):'), err)
+            }
+        },
+
         // логирование времени
         async postWorkLog(options: Answers) {
             try {
@@ -173,7 +187,7 @@ async function setStatus({ path, headers, task, value }: IUniversalOptions) {
     }
 }
 
-// измнение исполнителя
+// изменение исполнителя
 function setPerformer({ path, headers, task, value }: IUniversalOptions) {
     const fetchOptions = {
         method: 'PUT',

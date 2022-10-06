@@ -22,4 +22,8 @@ program
     .option('-m', 'My tasks')
     .action(actions.getReport)
 
+program
+    .command('git')
+    .action(actions.overGit)
+
 program.parse(process.argv)
