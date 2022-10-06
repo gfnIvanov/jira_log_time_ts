@@ -1,11 +1,13 @@
-import { ICommand, IRepData, IIssueInfo } from './Actions.types.js'
 import * as router from '../router/Router.js'
 import jiraAPI from '../jiraAPI/JiraAPI.js'
-import { parseDate, empty } from '../utils/utils.js'
+import GitExt from './git/GitExt.js'
 import config from '../config.js'
 import chalk from 'chalk'
-import { Answers } from 'inquirer'
 import _ from 'lodash'
+import { ICommand, IRepData, IIssueInfo } from './Actions.types.js'
+import { parseDate, empty } from '../utils/utils.js'
+import { Answers } from 'inquirer'
+import { exec } from 'child_process'
 
 const jira = jiraAPI(config.jiraOpts)
 
@@ -108,4 +110,41 @@ export async function getReport(command: ICommand = {}) {
     } catch (err) {
         console.error(chalk.red(err))
     }
+}
+
+// отправка изменений в репозиторий
+export async function overGit() {
+    const git = new GitExt
+    exec('git status --short', async (err, stdout) => {
+        try {
+            if (!empty(err)) {
+                throw new Error(`Ошибка при выполнении команды "git status --short": ${err}`)
+            }
+            console.log(stdout)
+            const addAnswer: Answers = await router.overGit('add')
+            if (addAnswer.addAll === 'Нет') {
+                await (async function addRepeate() {
+                    const { file, repeate }: Answers = await router.overGit('addFile')
+                    empty(file) ? console.log('Значение не может быть пустым!') : (git.newFile = file)
+                    repeate === 'Да' && await addRepeate()
+                })()
+            }
+            const commentAnswer: Answers = await router.overGit('comment')
+            exec('git branch --show-current', async (err, stdout) => {
+                try {
+                    if (!empty(err)) {
+                        throw new Error(`Ошибка при выполнении команды "git branch --show-current": ${err}`)
+                    }
+                    git.newBranch = stdout
+                    const codeName = await jira().getIssueCodeName(stdout.split('_')[0])
+                    git.newComment = `${codeName} ${commentAnswer.comment}`
+                    git.gitAdd()
+                } catch(err) {
+                    console.error(chalk.red(err))
+                }
+            })
+        } catch(err) {
+            console.error(chalk.red(err))
+        }
+    })
 }

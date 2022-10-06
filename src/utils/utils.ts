@@ -13,8 +13,8 @@ export function parseDate(mod: 'forJira' | 'forRead') {
 }
 
 // проверка на пустоту
-export function empty(item: string | undefined | object | boolean): boolean {
-    if (typeof (item) === 'object') {
+export function empty(item: string | undefined | null | object | boolean): boolean {
+    if (typeof item === 'object' && item != null) {
         if (Array.isArray(item)) {
             return item.length === 0;
         } else {

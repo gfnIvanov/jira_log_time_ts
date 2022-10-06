@@ -83,3 +83,30 @@ export const updateTaskLogQuestions: InqArr = [
         choices: config.taskPerformers.map(user => user.name)
     },
 ]
+
+export const gitQuestions: { [x: string]: InqArr } = {
+    add: [{
+        type: 'list',
+        name: 'addAll',
+        message: 'Добавить в индекс все изменения сразу?',
+        choices: ['Да', 'Нет']
+    }],
+    addFile: [
+        {
+            type: 'input',
+            name: 'file',
+            message: 'Добавить файл: '
+        },
+        {
+            type: 'list',
+            name: 'repeate',
+            message: 'Добавить еще один файл?',
+            choices: ['Да', 'Нет']
+        }
+    ],
+    comment: [{
+        type: 'input',
+        name: 'comment',
+        message: 'Комментарий: '
+    }]
+}
