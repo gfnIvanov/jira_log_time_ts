@@ -7,7 +7,7 @@ export default class GitExt {
     private branch!: string
     private comment: string | undefined
 
-    constructor () {
+    constructor() {
         this.files = []
     }
 
