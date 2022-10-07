@@ -2,6 +2,11 @@ import inquirer, { Answers } from 'inquirer'
 import * as c from './Router.consts.js'
 import _ from 'lodash'
 
+// список вопросов для логирования с автоподстановкой таска
+export function logTimeWithBranch(): Promise<Answers> {
+    return inquirer.prompt(c.logQuestions)
+}
+
 // список вопросов для автологирования
 export function autoLogTime(): Promise<Answers> {
     return inquirer.prompt(_.concat(c.autoLogQuestions, c.logQuestions))

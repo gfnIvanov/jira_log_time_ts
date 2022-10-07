@@ -14,15 +14,28 @@ const jira = jiraAPI(config.jiraOpts)
 // функция для логирования времени в ручном и авторежиме
 export async function logTime(command: ICommand) {
     let answer: Answers
-    if (empty(command.m)) {
+    if (empty(command)) {
+        answer = await router.logTimeWithBranch()
+        await new Promise<void>(resolve => exec('git branch --show-current', (err, stdout) => {
+            try {
+                if (!empty(err)) {
+                    throw new Error(`Ошибка при выполнении команды "git branch --show-current": ${err}`)
+                }
+                Object.assign(answer, { type: 'auto', task: stdout.split('_')[0] })
+                resolve()
+            } catch(err) {
+                console.error(chalk.red(err))
+            }
+        }))
+    } else if (command.p) {
         answer = await router.autoLogTime()
         Object.assign(answer, { type: 'auto', task: `MEDDEV-${answer.task}` })
-    } else {
+    } else if (command.f) {
         answer = await router.manualLogTime()
         Object.assign(answer, { type: 'manual', task: `${answer.project}-${answer.task}` })
     }
     try {
-        const status = await jira().postWorkLog(answer)
+        const status = await jira().postWorkLog(answer!)
         if (status === 200) {
             console.log(chalk.green('Данные успешно добавлены!'))
             getReport()

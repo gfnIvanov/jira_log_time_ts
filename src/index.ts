@@ -10,7 +10,8 @@ program
 
 program
     .command('log')
-    .option('-m', 'Manual log')
+    .option('-p', 'Enter part')
+    .option('-f', 'Enter full')
     .action(actions.logTime)
 
 program

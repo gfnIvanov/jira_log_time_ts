@@ -59,12 +59,12 @@ const config: JTSConfig = {
             name: 'Текущий'
         },
         {
-            login: 'i.dorogan',
-            name: 'Ирина Дороган'
+            login: 'i.myasnikov',
+            name: 'Иван Мясников'
         },
         {
-            login: 'a.mishchenko',
-            name: 'Артем Мищенко'
+            login: 'o.pavlova',
+            name: 'Ольга Павлова'
         }
     ]
 }
