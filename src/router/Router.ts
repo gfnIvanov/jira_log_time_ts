@@ -19,7 +19,7 @@ export function manualLogTime(): Promise<Answers> {
 
 // список вопросов для обновления данных таска
 export function updateTask(chunk: boolean): Promise<Answers> {
-    return inquirer.prompt(chunk ? _.pullAt(c.updateTaskLogQuestions, [1, 2, 3]) : c.updateTaskLogQuestions)
+    return inquirer.prompt(chunk ? _.pullAt(c.updateTaskLogQuestions, [2, 3, 4]) : c.updateTaskLogQuestions)
 }
 
 // список вопросов для взаимодействия с Git

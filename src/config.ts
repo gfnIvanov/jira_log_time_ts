@@ -55,7 +55,7 @@ const config: JTSConfig = {
     // сотрудники, на которых будут переводиться задачи
     taskPerformers: [
         {
-            login: '',
+            login: 'Текущий',
             name: 'Текущий'
         },
         {
