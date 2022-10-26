@@ -38,7 +38,8 @@ export async function logTime(command: ICommand) {
         const status = await jira().postWorkLog(answer!)
         if (status === 200) {
             console.log(chalk.green('Данные успешно добавлены!'))
-            getReport()
+            await getReport()
+            answer!.upd_task === 'Да' && updateTask(answer!.task)
         } else {
             throw new Error(`Ошибка при логировании времени (logTime): статус запроса (${status})`)
         }
@@ -49,15 +50,11 @@ export async function logTime(command: ICommand) {
 
 // функция для обновления задач
 export async function updateTask(task: string | undefined) {
-    const answer: Answers = await router.updateTask(false)
-    if (empty(task)) {
-        Object.assign(answer, {
-            task: `${answer.project}-${answer.task}`,
-            performer: config.taskPerformers.find(user => user.name === answer.performer)!.login
-        })
-    } else {
-        Object.assign(answer, { task })
-    }
+    const answer: Answers = await router.updateTask(!empty(task))
+    Object.assign(answer, {
+        task: empty(task) ? `${answer.project}-${answer.task}` : task,
+        performer: config.taskPerformers.find(user => user.name === answer.performer)!.login
+    })
     try {
         const res = await jira().updateTask(answer) as [{ url: string, status: string }]
         const errors = res.map(r => {
@@ -66,7 +63,7 @@ export async function updateTask(task: string | undefined) {
                 return ` ${action}: (status: ${r.status})`
             }
         })
-        if (errors.length > 0) {
+        if (!empty(errors)) {
             throw new Error(`Ошибка при обновлении задачи (updateTask): ${errors.join(' ')}`)
         } else {
             console.log(chalk.green('Данные успешно обновлены!'))

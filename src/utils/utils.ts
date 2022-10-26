@@ -16,7 +16,7 @@ export function parseDate(mod: 'forJira' | 'forRead') {
 export function empty(item: string | undefined | null | object | boolean): boolean {
     if (typeof item === 'object' && item != null) {
         if (Array.isArray(item)) {
-            return item.length === 0;
+            return item.length === 0 || item[0] == null;
         } else {
             return Object.keys(item).length === 0;
         }
