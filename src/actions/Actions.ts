@@ -147,7 +147,7 @@ export async function overGit() {
                     }
                     git.newBranch = stdout
                     const codeName = await jira().getIssueCodeName(stdout.split('_')[0])
-                    git.newComment = `${codeName} ${commentAnswer.comment}`
+                    git.newComment = `${codeName!.replaceAll('"', '')} ${commentAnswer.comment}`
                     git.gitAdd()
                 } catch(err) {
                     console.error(chalk.red(err))
