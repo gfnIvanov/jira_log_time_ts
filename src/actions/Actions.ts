@@ -3,6 +3,7 @@ import jiraAPI from '../jiraAPI/JiraAPI.js'
 import GitExt from './git/GitExt.js'
 import config from '../config.js'
 import chalk from 'chalk'
+import db from '../index.js'
 import _ from 'lodash'
 import { ICommand, IRepData, IIssueInfo } from './Actions.types.js'
 import { parseDate, empty } from '../utils/utils.js'
@@ -76,7 +77,7 @@ export async function updateTask(task: string | undefined) {
 // функция для получения отчетов
 export async function getReport(command: ICommand = {}) {
     try {
-        if (empty(command.m)) {
+        if (command.m) {
                 const repData = await jira().getReport('log') as { status: string, json: () => Promise<IRepData[]> }
                 if (+repData.status === 200) {
                     const resRepData = await repData.json()
@@ -100,6 +101,17 @@ export async function getReport(command: ICommand = {}) {
                 } else {
                     throw new Error(`Ошибка при получении отчета по залогированному времени (getReport): статус запроса (${repData.status})`)
                 }
+        } else if (command.w) {
+            const answer: Answers = await router.myWorkReport()
+            const date = empty(answer.date) ? parseDate('forRead')() : answer.date
+            db.find({ date }, {}, (err, doc) => {
+                if (!empty(err)) {
+                    throw new Error(`Ошибка при поиске данных: ${err}`)
+                }
+                const results = doc.map(item => ({ task: `https://jira-medmis.bars.group/browse/${/.+/.exec(item.task)![0]}`, pushCount: item.pushCount }))
+                console.log(date)
+                console.table(results)
+            })
         } else {
             const repData = await jira().getReport('my') as { status: string, json: () => Promise<{ issues: IIssueInfo[] }> }
             if (+repData.status === 200) {
@@ -124,7 +136,7 @@ export async function getReport(command: ICommand = {}) {
 
 // отправка изменений в репозиторий
 export async function overGit() {
-    const git = new GitExt
+    const git = new GitExt()
     exec('git status --short', async (err, stdout) => {
         try {
             if (!empty(err)) {
@@ -141,17 +153,33 @@ export async function overGit() {
             }
             const commentAnswer: Answers = await router.overGit('comment')
             exec('git branch --show-current', async (err, stdout) => {
-                try {
-                    if (!empty(err)) {
-                        throw new Error(`Ошибка при выполнении команды "git branch --show-current": ${err}`)
-                    }
-                    git.newBranch = stdout
-                    const codeName = await jira().getIssueCodeName(stdout.split('_')[0])
-                    git.newComment = `${codeName!.replaceAll('"', '')} ${commentAnswer.comment}`
-                    git.gitAdd()
-                } catch(err) {
-                    console.error(chalk.red(err))
+                if (!empty(err)) {
+                    throw new Error(`Ошибка при выполнении команды "git branch --show-current": ${err}`)
                 }
+                git.newBranch = stdout
+                const taskCode = stdout.split('_')[0]
+                const codeName = await jira().getIssueCodeName(taskCode)
+                git.newComment = `${codeName!.replaceAll('"', '')} ${commentAnswer.comment}`
+                git.gitAdd()
+                const today = parseDate('forRead')()
+                db.find({ $and: [{ task: taskCode }, { date: today }] }, {}, (err, doc) => {
+                    if (!empty(err)) {
+                        throw new Error(`Ошибка при поиске данных: ${err}`)
+                    }
+                    if (!empty(doc)) {
+                        db.update({ $and: [{ task: taskCode }, { date: today }] }, { $set: { pushCount: doc[0].pushCount + 1 } }, {}, err => {
+                            if (!empty(err)) {
+                                throw new Error(`Ошибка при обновлении данных: ${err}`)
+                            }
+                        })
+                    } else {
+                        db.insert({ task: taskCode, pushCount: 1, date: today }, err => {
+                            if (!empty(err)) {
+                                throw new Error(`Ошибка при сохранении данных: ${err}`)
+                            }
+                        })
+                    }
+                })
             })
         } catch(err) {
             console.error(chalk.red(err))

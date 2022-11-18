@@ -22,6 +22,11 @@ export function updateTask(chunk: boolean): Promise<Answers> {
     return inquirer.prompt(chunk ? _.pullAt(c.updateTaskLogQuestions, [2, 3, 4]) : c.updateTaskLogQuestions)
 }
 
+// вопрос для отчета по задачам за день
+export function myWorkReport(): Promise<Answers> {
+    return inquirer.prompt([c.myWorkQuestion])
+}
+
 // список вопросов для взаимодействия с Git
 export function overGit(command: 'add' | 'addFile' | 'comment' ): Promise<Answers> {
     switch (command) {
