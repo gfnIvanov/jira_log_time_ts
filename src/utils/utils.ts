@@ -1,14 +1,16 @@
 // парсинг дат
-export function parseDate(mod: 'forJira' | 'forRead'): (someDate?: string) => string
-export function parseDate(mod: 'forJira' | 'forRead'): (someDate: string) => string
-export function parseDate(mod: 'forJira' | 'forRead') {
+export function parseDate(mod: 'forJira' | 'forRead'): (someDate?: string) => string {
     switch (mod) {
         case 'forJira':
             return (someDate?: string) => {
                 return !someDate ? new Date().toISOString().split('T')[0] : someDate.split('.').reverse().join('-')
             }
         case 'forRead':
-            return (someDate: string) => someDate.split('T')[0].split('-').reverse().join('.')
+            return (someDate?: string) => {
+                return !someDate 
+                           ? new Date().toISOString().split('T')[0].split('-').reverse().join('.')  
+                           : someDate.split('T')[0].split('-').reverse().join('.')
+            }
     }
 }
 

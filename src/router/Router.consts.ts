@@ -84,6 +84,12 @@ export const updateTaskLogQuestions: InqArr = [
     },
 ]
 
+export const myWorkQuestion: Question = {
+    type: 'input',
+    name: 'date',
+    message: 'Дата в формате dd.mm.yyyy: '
+}
+
 export const gitQuestions: { [x: string]: InqArr } = {
     add: [{
         type: 'list',

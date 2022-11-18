@@ -2,6 +2,7 @@ import process from 'process'
 import { IJiraInitOptions } from "./jiraAPI/JiraAPI.types"
 
 type JTSConfig = {
+    projectPath: string,
     jiraOpts: IJiraInitOptions,
     workKind: string[],
     projects: string[],
@@ -10,6 +11,9 @@ type JTSConfig = {
 }
 
 const config: JTSConfig = {
+
+    // корневая папка проекта
+    projectPath: '/Users/igorivanov/dev/projects/jts',
 
     // опции для подключения к серверу Jira
     jiraOpts: {
